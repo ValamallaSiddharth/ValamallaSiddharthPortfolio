@@ -16,7 +16,7 @@ import {
   Wrench,
 } from 'lucide-react'
 import { profile } from '../data/profile'
-import { codingProfiles, type CodingProfileKey } from '../data/codingProfiles'
+import { codingProfiles, featuredRepoNames, type CodingProfileKey } from '../data/codingProfiles'
 import { skills } from '../data/portfolio'
 import { InteractiveAvatar } from './InteractiveAvatar'
 
@@ -33,6 +33,7 @@ const languageColors: Record<string, string> = {
   TypeScript: '#3178c6',
   JavaScript: '#f1e05a',
   Python: '#3572A5',
+  'Jupyter Notebook': '#DA5B0B',
   HTML: '#e34c26',
   CSS: '#563d7c',
   'C++': '#f34b7d',
@@ -388,6 +389,13 @@ type GithubRepo = {
   language: string | null
 }
 
+const fallbackRepos: GithubRepo[] = [
+  { id: 1, name: 'PS-4', html_url: `https://github.com/${codingProfiles.github.username}/PS-4`, description: 'Interactive JavaScript web project', stargazers_count: 0, forks_count: 0, language: 'JavaScript' },
+  { id: 2, name: 'OpenCV', html_url: `https://github.com/${codingProfiles.github.username}/OpenCV`, description: 'Computer vision algorithms & image processing', stargazers_count: 0, forks_count: 0, language: 'Jupyter Notebook' },
+  { id: 3, name: 'AutoFaceLock', html_url: `https://github.com/${codingProfiles.github.username}/AutoFaceLock`, description: 'Real-time facial recognition security lock system', stargazers_count: 0, forks_count: 0, language: 'Python' },
+  { id: 4, name: 'Body-measurement', html_url: `https://github.com/${codingProfiles.github.username}/Body-measurement`, description: 'Automated computer vision body measurement system', stargazers_count: 0, forks_count: 0, language: 'Python' },
+]
+
 export function CodingProfiles() {
   const [repos, setRepos] = useState<GithubRepo[]>([])
   const [repoState, setRepoState] = useState<'loading' | 'ready' | 'empty' | 'unavailable'>('loading')
@@ -400,7 +408,7 @@ export function CodingProfiles() {
       if (started) return
       started = true
       fetch(
-        `https://api.github.com/users/${codingProfiles.github.username}/repos?sort=updated&per_page=3&type=owner`,
+        `https://api.github.com/users/${codingProfiles.github.username}/repos?per_page=30&type=owner`,
         {
           headers: { Accept: 'application/vnd.github+json' },
           signal: controller.signal,
@@ -411,13 +419,19 @@ export function CodingProfiles() {
           return response.json() as Promise<GithubRepo[]>
         })
         .then((data) => {
-          const visible = data.filter((repo) => repo.name && repo.html_url).slice(0, 3)
-          setRepos(visible)
-          setRepoState(visible.length ? 'ready' : 'empty')
+          const repoMap = new Map(data.map((r) => [r.name.toLowerCase(), r]))
+          const prioritized = featuredRepoNames
+            .map((name) => repoMap.get(name.toLowerCase()))
+            .filter((r): r is GithubRepo => Boolean(r && r.html_url))
+          const remaining = data.filter((r) => r.name && r.html_url && !prioritized.some((p) => p.id === r.id))
+          const visible = [...prioritized, ...remaining].slice(0, 4)
+          setRepos(visible.length ? visible : fallbackRepos)
+          setRepoState('ready')
         })
         .catch((error: unknown) => {
           if (error instanceof Error && error.name === 'AbortError') return
-          setRepoState('unavailable')
+          setRepos(fallbackRepos)
+          setRepoState('ready')
         })
     }
 

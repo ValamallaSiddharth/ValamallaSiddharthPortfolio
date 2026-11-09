@@ -1,5 +1,7 @@
 export type CodingProfileKey = 'github' | 'leetcode' | 'codechef' | 'hackerrank' | 'linkedin'
 
+export const featuredRepoNames = ['PS-4', 'OpenCV', 'AutoFaceLock', 'Body-measurement'] as const
+
 export const codingProfiles = {
   github: {
     name: 'GitHub',

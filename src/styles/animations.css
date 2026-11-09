@@ -1,0 +1,166 @@
+/* ==========================================================================
+   ANIMATIONS & MOTION SYSTEM (Strictly transform & opacity)
+   ========================================================================== */
+
+@keyframes hero-sphere-surface-roll {
+  0% {
+    transform: translateZ(0) rotate3d(0, 0, 1, 0deg) scale(1.08);
+  }
+  100% {
+    transform: translateZ(0) rotate3d(0, 0, 1, 360deg) scale(1.08);
+  }
+}
+
+@keyframes ticker-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.86) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes avatar-float-idle {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
+@keyframes orbit-spin {
+  0% {
+    transform: translateZ(0) rotate3d(0, 0, 1, 0deg);
+  }
+  100% {
+    transform: translateZ(0) rotate3d(0, 0, 1, 360deg);
+  }
+}
+
+@keyframes orbit-spin-rev {
+  0% {
+    transform: translateZ(0) rotate3d(0, 0, 1, 360deg);
+  }
+  100% {
+    transform: translateZ(0) rotate3d(0, 0, 1, 0deg);
+  }
+}
+
+@keyframes avatar-glitch {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  20% {
+    transform: translate3d(-4px, 2px, 0) scale(1.02);
+    filter: drop-shadow(-3px 0 0 #21F1A8);
+  }
+  40% {
+    transform: translate3d(4px, -2px, 0) scale(0.99);
+    filter: drop-shadow(3px 0 0 #42f4b7);
+  }
+  60% {
+    transform: translate3d(-2px, 2px, 0) scale(1.01);
+    filter: drop-shadow(-2px 0 0 #16b87e);
+  }
+  80% {
+    transform: translate3d(2px, -1px, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.45));
+  }
+}
+
+/* Hero background animation with GPU compositor promotion and smooth 16s linear pace */
+.site-background-orb::after {
+  will-change: transform;
+  animation: hero-sphere-surface-roll 16s linear infinite;
+}
+
+[data-page-hidden='true'] .site-background-orb::after {
+  animation-play-state: paused;
+}
+
+/* Skills Ticker: pauses on hover or focus of the marquee container only */
+.skills-marquee-track {
+  will-change: transform;
+  animation: ticker-drift 38s linear infinite;
+}
+
+.skills-marquee:hover .skills-marquee-track,
+.skills-marquee:focus .skills-marquee-track,
+.skills-marquee:focus-within .skills-marquee-track {
+  animation-play-state: paused;
+}
+
+/* Scroll reveal motion */
+.motion-ready [data-visible='false'] {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+}
+
+.motion-ready [data-visible='true'] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: opacity 0.65s var(--ease-out), transform 0.65s var(--ease-out);
+}
+
+.motion-ready .skill-group[data-visible='true'],
+.motion-ready .project-card[data-visible='true'] {
+  transition-delay: calc(var(--item-index, 0) * 60ms);
+}
+
+/* Accessibility: Full reduced-motion override */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .site-background-orb::after,
+  .avatar-3d-stage,
+  .avatar-orbit-ring,
+  .hero-avatar-wrapper.is-glitching .avatar-svg {
+    animation: none !important;
+  }
+
+  .skills-marquee {
+    overflow-x: auto !important;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+    scrollbar-width: thin;
+  }
+
+  .skills-marquee-track {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .motion-ready [data-visible='false'],
+  .motion-ready [data-visible='true'] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

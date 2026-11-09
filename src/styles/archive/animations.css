@@ -1,0 +1,40 @@
+/* Subtle site motion */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes nav-slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(8px) scale(.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes float-sun {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes float-blob {
+  0%, 100% { transform: rotate(30deg) translateY(0); }
+  50% { transform: rotate(31deg) translateY(-5px); }
+}
+
+@keyframes float-arch {
+  0%, 100% { transform: rotate(-19deg) translateY(0); }
+  50% { transform: rotate(-18deg) translateY(4px); }
+}
+
+@keyframes spark-float {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(10deg); }
+}
+
+.art-sun { animation: float-sun 8s ease-in-out infinite; }
+.shape-blob { animation: float-blob 10s ease-in-out infinite; }
+.shape-arch { animation: float-arch 11s ease-in-out infinite; }
+.contact-spark { display: inline-block; animation: spark-float 7s ease-in-out infinite; }

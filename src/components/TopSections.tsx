@@ -177,8 +177,7 @@ export function Hero() {
     const hero = document.getElementById('home')
     if (!hero) return
     const syncVisibility = () => {
-      if (document.hidden) document.documentElement.setAttribute('data-page-hidden', 'true')
-      else document.documentElement.removeAttribute('data-page-hidden')
+      document.documentElement.toggleAttribute('data-page-hidden', document.hidden)
     }
     syncVisibility()
     document.addEventListener('visibilitychange', syncVisibility)
@@ -284,30 +283,16 @@ export function About() {
         </div>
 
         <div className="about-facts">
-          <div>
-            <span>01</span>
-            <p>
-              Thoughtful
-              <br />
-              by default
-            </p>
-          </div>
-          <div>
-            <span>02</span>
-            <p>
-              Always learning
-              <br />
-              something new
-            </p>
-          </div>
-          <div>
-            <span>03</span>
-            <p>
-              Details matter.
-              <br />
-              People matter more.
-            </p>
-          </div>
+          {[
+            ['01', 'Thoughtful', 'by default'],
+            ['02', 'Always learning', 'something new'],
+            ['03', 'Details matter.', 'People matter more.'],
+          ].map(([num, l1, l2]) => (
+            <div key={num}>
+              <span>{num}</span>
+              <p>{l1}<br />{l2}</p>
+            </div>
+          ))}
           <div className="about-doodle" aria-hidden="true">
             ✳
           </div>
@@ -538,22 +523,16 @@ export function CodingProfiles() {
               </a>
             </div>
 
-            {repoState === 'loading' && (
+            {repoState !== 'ready' && (
               <p className="repo-message">
-                <span className="repo-pulse" aria-hidden="true" />
-                <span>Checking public repositories…</span>
-              </p>
-            )}
-
-            {repoState === 'unavailable' && (
-              <p className="repo-message">
-                Repository details are unavailable right now. Visit GitHub to explore the profile.
-              </p>
-            )}
-
-            {repoState === 'empty' && (
-              <p className="repo-message">
-                No public repositories are available to show yet.
+                {repoState === 'loading' && <span className="repo-pulse" aria-hidden="true" />}
+                <span>
+                  {repoState === 'loading'
+                    ? 'Checking public repositories…'
+                    : repoState === 'empty'
+                    ? 'No public repositories are available to show yet.'
+                    : 'Repository details are unavailable right now. Visit GitHub to explore the profile.'}
+                </span>
               </p>
             )}
 

@@ -6,6 +6,12 @@ import { profile } from '../data/profile'
 const projectImageUrl = (image: string, width: number) =>
   `https://images.unsplash.com/${image}?auto=format&fit=crop&w=${width}&h=${Math.round(width * 0.75)}&q=78`
 
+const projectStamps: Record<string, [string, string]> = {
+  '01': ['GOOD', 'IDEAS'],
+  '02': ['MADE WITH', 'CURIOSITY'],
+  '03': ['IN PROGRESS', '✳'],
+}
+
 export function Projects() {
   return (
     <section className="section work-section" id="work">
@@ -53,25 +59,9 @@ export function Projects() {
                   <ArrowUpRight size={18} />
                 </span>
                 <span className="project-stamp" aria-hidden="true">
-                  {project.number === '01' ? (
-                    <>
-                      GOOD
-                      <br />
-                      IDEAS
-                    </>
-                  ) : project.number === '02' ? (
-                    <>
-                      MADE WITH
-                      <br />
-                      CURIOSITY
-                    </>
-                  ) : (
-                    <>
-                      IN PROGRESS
-                      <br />
-                      ✳
-                    </>
-                  )}
+                  {projectStamps[project.number]?.[0]}
+                  <br />
+                  {projectStamps[project.number]?.[1]}
                 </span>
               </a>
 

@@ -8,19 +8,13 @@ type Mat4 = Float32Array
 
 function mat4Create(): Mat4 {
   const out = new Float32Array(16)
-  out[0] = 1
-  out[5] = 1
-  out[10] = 1
-  out[15] = 1
+  out[0] = out[5] = out[10] = out[15] = 1
   return out
 }
 
 function mat4Identity(out: Mat4): Mat4 {
   out.fill(0)
-  out[0] = 1
-  out[5] = 1
-  out[10] = 1
-  out[15] = 1
+  out[0] = out[5] = out[10] = out[15] = 1
   return out
 }
 
@@ -30,35 +24,18 @@ function mat4Multiply(out: Mat4, a: Mat4, b: Mat4): Mat4 {
   const a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11]
   const a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15]
 
-  let b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3]
-  out[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30
-  out[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31
-  out[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32
-  out[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33
-
-  b0 = b[4]; b1 = b[5]; b2 = b[6]; b3 = b[7]
-  out[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30
-  out[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31
-  out[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32
-  out[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33
-
-  b0 = b[8]; b1 = b[9]; b2 = b[10]; b3 = b[11]
-  out[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30
-  out[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31
-  out[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32
-  out[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33
-
-  b0 = b[12]; b1 = b[13]; b2 = b[14]; b3 = b[15]
-  out[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30
-  out[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31
-  out[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32
-  out[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33
+  for (let i = 0; i < 16; i += 4) {
+    const b0 = b[i], b1 = b[i + 1], b2 = b[i + 2], b3 = b[i + 3]
+    out[i] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30
+    out[i + 1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31
+    out[i + 2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32
+    out[i + 3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33
+  }
   return out
 }
 
 function mat4Perspective(out: Mat4, fovy: number, aspect: number, near: number, far: number): Mat4 {
-  const f = 1.0 / Math.tan(fovy / 2)
-  const nf = 1 / (near - far)
+  const f = 1.0 / Math.tan(fovy / 2), nf = 1 / (near - far)
   out.fill(0)
   out[0] = f / aspect
   out[5] = f
@@ -68,9 +45,8 @@ function mat4Perspective(out: Mat4, fovy: number, aspect: number, near: number, 
   return out
 }
 
-function mat4Translate(out: Mat4, a: Mat4, v: [number, number, number]): Mat4 {
-  const x = v[0], y = v[1], z = v[2]
-  out.set(a)
+function mat4Translate(out: Mat4, a: Mat4, [x, y, z]: [number, number, number]): Mat4 {
+  if (out !== a) out.set(a)
   out[12] = a[0] * x + a[4] * y + a[8] * z + a[12]
   out[13] = a[1] * x + a[5] * y + a[9] * z + a[13]
   out[14] = a[2] * x + a[6] * y + a[10] * z + a[14]
@@ -83,14 +59,8 @@ function mat4RotateX(out: Mat4, a: Mat4, rad: number): Mat4 {
   const a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7]
   const a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11]
   if (a !== out) out.set(a)
-  out[4] = a10 * c + a20 * s
-  out[5] = a11 * c + a21 * s
-  out[6] = a12 * c + a22 * s
-  out[7] = a13 * c + a23 * s
-  out[8] = a20 * c - a10 * s
-  out[9] = a21 * c - a11 * s
-  out[10] = a22 * c - a12 * s
-  out[11] = a23 * c - a13 * s
+  out[4] = a10 * c + a20 * s; out[5] = a11 * c + a21 * s; out[6] = a12 * c + a22 * s; out[7] = a13 * c + a23 * s
+  out[8] = a20 * c - a10 * s; out[9] = a21 * c - a11 * s; out[10] = a22 * c - a12 * s; out[11] = a23 * c - a13 * s
   return out
 }
 
@@ -99,14 +69,8 @@ function mat4RotateY(out: Mat4, a: Mat4, rad: number): Mat4 {
   const a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3]
   const a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11]
   if (a !== out) out.set(a)
-  out[0] = a00 * c - a20 * s
-  out[1] = a01 * c - a21 * s
-  out[2] = a02 * c - a22 * s
-  out[3] = a03 * c - a23 * s
-  out[8] = a00 * s + a20 * c
-  out[9] = a01 * s + a21 * c
-  out[10] = a02 * s + a22 * c
-  out[11] = a03 * s + a23 * c
+  out[0] = a00 * c - a20 * s; out[1] = a01 * c - a21 * s; out[2] = a02 * c - a22 * s; out[3] = a03 * c - a23 * s
+  out[8] = a00 * s + a20 * c; out[9] = a01 * s + a21 * c; out[10] = a02 * s + a22 * c; out[11] = a03 * s + a23 * c
   return out
 }
 
@@ -115,14 +79,8 @@ function mat4RotateZ(out: Mat4, a: Mat4, rad: number): Mat4 {
   const a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3]
   const a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7]
   if (a !== out) out.set(a)
-  out[0] = a00 * c + a10 * s
-  out[1] = a01 * c + a11 * s
-  out[2] = a02 * c + a12 * s
-  out[3] = a03 * c + a13 * s
-  out[4] = a10 * c - a00 * s
-  out[5] = a11 * c - a01 * s
-  out[6] = a12 * c - a02 * s
-  out[7] = a13 * c - a03 * s
+  out[0] = a00 * c + a10 * s; out[1] = a01 * c + a11 * s; out[2] = a02 * c + a12 * s; out[3] = a03 * c + a13 * s
+  out[4] = a10 * c - a00 * s; out[5] = a11 * c - a01 * s; out[6] = a12 * c - a02 * s; out[7] = a13 * c - a03 * s
   return out
 }
 
@@ -570,13 +528,15 @@ export function InteractiveAvatar() {
     const orbitRing1Mesh = uploadMesh(createTorus(0.74, 0.009, 6, 44))
     const orbitRing2Mesh = uploadMesh(createTorus(0.64, 0.007, 6, 36))
 
-    // Matrices
-    const projMat = mat4Create()
-    const viewMat = mat4Create()
-    const modelMat = mat4Create()
-    const mvMat = mat4Create()
-    const mvpMat = mat4Create()
-    const normMat = mat4Create()
+    // Global & Projection Matrices
+    const projMat = mat4Create(), viewMat = mat4Create(), modelMat = mat4Create()
+    const mvMat = mat4Create(), mvpMat = mat4Create(), normMat = mat4Create()
+
+    // Pre-allocated Part Matrices (Zero GC per-frame allocation)
+    const torsoMat = mat4Create(), shoulderMat = mat4Create(), circuitMat = mat4Create()
+    const neckMat = mat4Create(), neckRingMat = mat4Create(), headMat = mat4Create()
+    const craniumMat = mat4Create(), jawMat = mat4Create(), visorMat = mat4Create()
+    const earLMat = mat4Create(), earRMat = mat4Create(), ring1Mat = mat4Create(), ring2Mat = mat4Create()
 
     gl.enable(gl.DEPTH_TEST)
     gl.enable(gl.BLEND)
@@ -674,74 +634,61 @@ export function InteractiveAvatar() {
       mat4RotateZ(modelMat, modelMat, breathTilt * 0.5)
 
       // Torso Chest Plate
-      const torsoMat = mat4Create()
       mat4Translate(torsoMat, modelMat, [0, 0.36, 0])
       drawMesh(torsoMesh, torsoMat, 0, [0.09, 0.09, 0.09])
 
       // Shoulder Armor Plate
-      const shoulderMat = mat4Create()
       mat4Translate(shoulderMat, modelMat, [0, 0.48, 0.02])
       drawMesh(shoulderPlateMesh, shoulderMat, 0, [0.12, 0.12, 0.12])
 
       // Cyan Circuit Inlays
-      const circuitMat = mat4Create()
       mat4Translate(circuitMat, modelMat, [0, 0.42, 0.28])
       drawMesh(circuitMesh, circuitMat, 2)
 
       // 2. Articulated Cyber Neck
-      const neckMat = mat4Create()
       mat4Translate(neckMat, modelMat, [0, 0.72, 0])
       mat4RotateY(neckMat, neckMat, currentRotYRef.current * 0.3)
       mat4RotateX(neckMat, neckMat, currentRotXRef.current * 0.2)
       drawMesh(neckMesh, neckMat, 0, [0.11, 0.11, 0.11])
 
-      const neckRingMat = mat4Create()
       mat4Translate(neckRingMat, neckMat, [0, 0.04, 0])
       mat4RotateX(neckRingMat, neckRingMat, Math.PI / 2)
       drawMesh(neckRingMesh, neckRingMat, 2)
 
       // 3. Faceted Head & Gaze Pivot
-      const headMat = mat4Create()
       mat4Translate(headMat, modelMat, [0, 0.96 + breathY, 0])
       mat4RotateY(headMat, headMat, currentRotYRef.current)
       mat4RotateX(headMat, headMat, currentRotXRef.current + nodAngle)
 
       // Cranium Core
-      const craniumMat = mat4Create()
       mat4Translate(craniumMat, headMat, [0, 0.18, 0])
       drawMesh(headMesh, craniumMat, 0, [0.09, 0.09, 0.09])
 
       // Angular Jaw & Chin Guard
-      const jawMat = mat4Create()
       mat4Translate(jawMat, headMat, [0, -0.04, 0.08])
       mat4RotateX(jawMat, jawMat, 0.18)
       drawMesh(jawMesh, jawMat, 0, [0.12, 0.12, 0.12])
 
       // Glowing Cyber Visor
-      const visorMat = mat4Create()
       mat4Translate(visorMat, headMat, [0, 0.16, 0.08])
       mat4RotateX(visorMat, visorMat, 0.12)
       drawMesh(visorMesh, visorMat, 1)
 
       // Left & Right Ear Audio Pods
-      const earLMat = mat4Create()
       mat4Translate(earLMat, headMat, [-0.4, 0.16, 0])
       mat4RotateZ(earLMat, earLMat, Math.PI / 2)
       drawMesh(earPodMesh, earLMat, 0, [0.12, 0.12, 0.12])
 
-      const earRMat = mat4Create()
       mat4Translate(earRMat, headMat, [0.4, 0.16, 0])
       mat4RotateZ(earRMat, earRMat, -Math.PI / 2)
       drawMesh(earPodMesh, earRMat, 0, [0.12, 0.12, 0.12])
 
       // 4. Floating Holographic Orbit Rings
-      const ring1Mat = mat4Create()
       mat4Translate(ring1Mat, modelMat, [0, 1.1 + breathY, 0])
       mat4RotateX(ring1Mat, ring1Mat, Math.PI / 3)
       mat4RotateZ(ring1Mat, ring1Mat, timeSec * (0.45 + hoverAnimRef.current * 0.35))
       drawMesh(orbitRing1Mesh, ring1Mat, 3)
 
-      const ring2Mat = mat4Create()
       mat4Translate(ring2Mat, modelMat, [0, 1.1 + breathY, 0])
       mat4RotateX(ring2Mat, ring2Mat, -Math.PI / 3.5)
       mat4RotateZ(ring2Mat, ring2Mat, -timeSec * (0.65 + hoverAnimRef.current * 0.45))
